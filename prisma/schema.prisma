@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  expenses       Expense[]
+  monthlyReports MonthlyReport[]
+
+  @@map("users")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  description String
+  amount      Int
+  category    String   @default("other")
+  aiNote      String?  @map("ai_note")
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
+}
+
+model MonthlyReport {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  year           Int
+  month          Int
+  score          Int
+  scoreReason    String   @map("score_reason")
+  summary        String
+  leaks          Json
+  wins           Json
+  categoryTotals Json     @map("category_totals")
+  generatedAt    DateTime @default(now()) @map("generated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year, month])
+  @@map("monthly_reports")
+}
+
