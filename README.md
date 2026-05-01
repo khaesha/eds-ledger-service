@@ -1,53 +1,240 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Edda's Ledger — Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS-based REST API server for **Edda's Ledger**, a personal finance platform with AI-powered financial insights. Handles authentication, expense management, financial reporting, and real-time chat with Edda AI.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🎯 Features
 
-## Description
+- **Authentication**: JWT-based login, registration, and secure session management
+- **Expense Tracking**: CRUD operations and bulk CSV import with AI categorization
+- **Financial Reports**: Monthly spending analysis with AI-generated insights, score calculation, and leak detection
+- **Edda AI Chat**: Real-time conversational interface for financial advice
+- **AI Integration**: LLaMA 3.1 model via OpenRouter for expense categorization and report generation
+- **Database**: PostgreSQL via Prisma ORM (Supabase-ready)
+- **Rate Limiting**: Throttler module to prevent abuse
+- **Security**: JWT validation, CORS, helmet headers
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🛠 Tech Stack
 
-## Project setup
+- **Framework**: [NestJS 11](https://docs.nestjs.com)
+- **Language**: TypeScript 5
+- **ORM**: [Prisma 7](https://www.prisma.io) with PostgreSQL adapter
+- **Authentication**: [Passport.js](http://www.passportjs.org) with JWT strategy
+- **Validation**: class-validator & class-transformer
+- **AI**: [OpenAI SDK](https://github.com/openai/openai-node) pointed to OpenRouter
+- **HTTP**: Express with CORS & helmet middleware
+- **Testing**: Jest with e2e support
 
+## 📋 Requirements
+
+- Node.js >= 18
+- PostgreSQL 14+ (local or Supabase)
+- npm >= 9
+- OpenRouter API key (for Edda AI)
+
+## 🚀 Getting Started
+
+### 1. Install Dependencies
 ```bash
-$ npm install
+cd backend
+npm install
 ```
 
-## Compile and run the project
+### 2. Configure Environment
+Create `.env`:
+```env
+# Database (Supabase format)
+DATABASE_URL="postgresql://postgres:[PASSWORD]@[PROJECT].supabase.co:5432/postgres?schema=public"
 
-```bash
-# development
-$ npm run start
+# JWT
+JWT_SECRET=your_random_jwt_secret_here
 
-# watch mode
-$ npm run start:dev
+# AI / OpenRouter
+OPENROUTER_API_KEY=sk_...your_openrouter_key...
 
-# production mode
-$ npm run start:prod
+# App
+NODE_ENV=development
+PORT=3001
 ```
 
-## Run tests
+### 3. Setup Database
+```bash
+npx prisma migrate deploy
+npx prisma generate
+```
+
+### 4. Run Development Server
+```bash
+npm run start:dev
+```
+
+Server runs on `http://localhost:3001`
+
+### 5. Build for Production
+```bash
+npm run build
+npm run start:prod
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── main.ts                # App bootstrap
+├── app.module.ts          # Root module
+├── auth/                  # Authentication
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── auth.dto.ts
+│   ├── jwt.strategy.ts    # Passport strategy
+│   └── auth.module.ts
+├── expenses/              # Expense management
+│   ├── expenses.controller.ts
+│   ├── expenses.service.ts
+│   ├── expenses.dto.ts
+│   └── expenses.module.ts
+├── reports/               # Financial reports
+│   ├── reports.controller.ts
+│   ├── reports.service.ts
+│   └── reports.module.ts
+├── chat/                  # Chat interface
+│   ├── chat.controller.ts
+│   ├── chat.service.ts
+│   ├── chat.dto.ts
+│   └── chat.module.ts
+├── ai/                    # LLM integration
+│   ├── ai.service.ts      # OpenRouter client
+│   └── ai.module.ts
+├── prisma/                # Database layer
+│   ├── prisma.service.ts
+│   └── prisma.module.ts
+└── common/
+    ├── decorators/
+    │   └── current-user.decorator.ts  # @CurrentUser() for JWT payloads
+    └── guards/
+        └── jwt.guard.ts               # Protected routes
+```
+
+## 📡 API Endpoints
+
+### Auth
+- `POST /auth/register` — Register new user
+- `POST /auth/login` — Login & receive JWT token
+
+### Expenses (protected)
+- `GET /expenses` — List user's expenses
+- `POST /expenses` — Create new expense
+- `POST /expenses/import` — Import CSV file
+
+### Reports (protected)
+- `GET /reports/:year/:month` — Fetch monthly report
+- `POST /reports/:year/:month/generate` — Generate AI report
+
+### Chat (protected)
+- `POST /chat/ask` — Send message to Edda AI
+
+## 🔐 Authentication
+
+All endpoints except `/auth/*` require JWT in `Authorization` header:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+Use `@CurrentUser()` decorator in controllers to access the authenticated user:
+```typescript
+@Post('example')
+@UseGuards(JwtAuthGuard)
+example(@CurrentUser() user: User) {
+  return { userId: user.id };
+}
+```
+
+## 🤖 AI Integration
+
+Edda AI uses three core prompts:
+
+1. **Expense Categorization** — Categorizes new expenses into: food, transport, entertainment, utilities, shopping, health, other
+2. **Monthly Report Generation** — Analyzes spending patterns, calculates score (0-100), detects leaks, and recommends wins
+3. **Chat Response** — Real-time financial advice based on current month's category totals
+
+All prompts include: *"All amounts are in IDR (Indonesian Rupiah)"* for proper financial context.
+
+## 💾 Database Schema
+
+### User
+```
+id (UUID, PK)
+email (String, unique)
+name (String)
+passwordHash (String)
+createdAt (DateTime)
+```
+
+### Expense
+```
+id (UUID, PK)
+userId (UUID, FK → User)
+amount (Decimal)
+category (String)
+date (DateTime)
+description (String)
+aiNote (String, nullable)
+createdAt (DateTime)
+```
+
+### MonthlyReport
+```
+id (UUID, PK)
+userId (UUID, FK → User)
+year (Int)
+month (Int)
+score (Int)
+scoreReason (String)
+summary (String)
+leaks (JSON array)
+wins (JSON array)
+categoryTotals (JSON)
+generatedAt (DateTime)
+```
+
+Relations: User → Expenses/Reports (cascade delete)
+
+## 🧪 Testing
 
 ```bash
-# unit tests
+# Unit tests
+npm run test
+
+# Watch mode
+npm run test:watch
+
+# Coverage
+npm run test:cov
+
+# E2E tests
+npm run test:e2e
+```
+
+## 🚀 Deployment
+
+### Supabase
+See [SUPABASE_SETUP.md](../SUPABASE_SETUP.md) for full setup.
+
+### Docker
+```bash
+docker-compose up -d
+```
+
+### Vercel / Railway / Heroku
+1. Set `DATABASE_URL`, `JWT_SECRET`, `OPENROUTER_API_KEY` env vars
+2. Run migrations: `npx prisma migrate deploy`
+3. Build: `npm run build`
+4. Start: `npm run start:prod`
+
+## 🔗 Related
+
+- [Frontend App](../frontend/README.md)
+- [Supabase Setup](../SUPABASE_SETUP.md)
+- [Project Plan](../eds-ledger-project-plan.md)
 $ npm run test
 
 # e2e tests
