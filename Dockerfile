@@ -35,8 +35,8 @@ RUN apk add --no-cache dumb-init
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install only production dependencies (skip scripts since we already built everything)
+RUN npm ci --only=production --ignore-scripts && npm cache clean --force
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
