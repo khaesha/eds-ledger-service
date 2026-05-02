@@ -31,8 +31,11 @@ RUN apk add --no-cache dumb-init
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies (skip scripts since we already built everything)
+# Install only production dependencies (skip scripts)
 RUN npm ci --only=production --ignore-scripts && npm cache clean --force
+
+# Copy generated Prisma Client from builder
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
