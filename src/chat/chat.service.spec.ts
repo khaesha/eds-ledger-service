@@ -34,7 +34,7 @@ describe('ChatService', () => {
     }).compile();
 
     service = module.get<ChatService>(ChatService);
-    prismaService = module.get(PrismaService) as any;
+    prismaService = module.get(PrismaService);
     aiService = module.get<AiService>(AiService);
   });
 

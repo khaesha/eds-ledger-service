@@ -83,9 +83,7 @@ describe('Reports E2E', () => {
     });
 
     it('should return 400 for invalid year parameter', async () => {
-      await request(app.getHttpServer())
-        .get('/reports/invalid/5')
-        .expect(400);
+      await request(app.getHttpServer()).get('/reports/invalid/5').expect(400);
     });
 
     it('should return 400 for invalid month parameter', async () => {

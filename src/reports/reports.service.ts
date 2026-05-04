@@ -28,7 +28,8 @@ export class ReportsService {
     const categoryTotals: Record<string, number> = {};
     let totalSpent = 0;
     for (const exp of expenses) {
-      categoryTotals[exp.category] = (categoryTotals[exp.category] ?? 0) + exp.amount;
+      categoryTotals[exp.category] =
+        (categoryTotals[exp.category] ?? 0) + exp.amount;
       totalSpent += exp.amount;
     }
 

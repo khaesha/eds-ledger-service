@@ -89,28 +89,19 @@ describe('Chat E2E', () => {
     it('should return 400 for empty message', async () => {
       const dto = { message: '' };
 
-      await request(app.getHttpServer())
-        .post('/chat')
-        .send(dto)
-        .expect(400);
+      await request(app.getHttpServer()).post('/chat').send(dto).expect(400);
     });
 
     it('should return 400 for missing message field', async () => {
       const dto = {};
 
-      await request(app.getHttpServer())
-        .post('/chat')
-        .send(dto)
-        .expect(400);
+      await request(app.getHttpServer()).post('/chat').send(dto).expect(400);
     });
 
     it('should return 400 for message exceeding max length', async () => {
       const dto = { message: 'x'.repeat(1001) };
 
-      await request(app.getHttpServer())
-        .post('/chat')
-        .send(dto)
-        .expect(400);
+      await request(app.getHttpServer()).post('/chat').send(dto).expect(400);
     });
 
     it('should accept messages with special characters', async () => {

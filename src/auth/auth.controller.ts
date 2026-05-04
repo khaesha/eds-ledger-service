@@ -31,7 +31,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  me(@Request() req: Express.Request & { user: { id: string; email: string } }) {
+  me(
+    @Request() req: Express.Request & { user: { id: string; email: string } },
+  ) {
     return req.user;
   }
 }

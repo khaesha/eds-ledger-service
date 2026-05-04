@@ -4,7 +4,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { NotFoundException } from '@nestjs/common';
 import { createMockPrismaService } from '../__tests__/mocks/prisma.mock';
-import { testUsers, testExpenses, testReports } from '../__tests__/fixtures/test-data';
+import {
+  testUsers,
+  testExpenses,
+  testReports,
+} from '../__tests__/fixtures/test-data';
 
 describe('ReportsService', () => {
   let service: ReportsService;
@@ -35,7 +39,7 @@ describe('ReportsService', () => {
     }).compile();
 
     service = module.get<ReportsService>(ReportsService);
-    prismaService = module.get(PrismaService) as any;
+    prismaService = module.get(PrismaService);
     aiService = module.get<AiService>(AiService);
   });
 

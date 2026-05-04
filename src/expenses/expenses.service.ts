@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { CreateExpenseDto } from './expenses.dto';
@@ -86,7 +90,10 @@ export class ExpensesService {
     let categorized: import('../ai/ai.service').CategorizedExpense[] = [];
     try {
       categorized = await this.ai.categorizeExpenses(
-        toProcess.map((r) => ({ description: r.description, amount: r.amount })),
+        toProcess.map((r) => ({
+          description: r.description,
+          amount: r.amount,
+        })),
       );
     } catch {
       // AI unavailable — import with fallback category

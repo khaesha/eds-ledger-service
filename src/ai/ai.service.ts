@@ -68,7 +68,9 @@ ai_note is a SHORT 1-sentence Edward-style comment (max 10 words). Return ONLY v
 
     try {
       const text = completion.choices[0]?.message?.content ?? '[]';
-      const parsed: unknown = JSON.parse(text.replace(/```json|```/g, '').trim());
+      const parsed: unknown = JSON.parse(
+        text.replace(/```json|```/g, '').trim(),
+      );
       if (!Array.isArray(parsed)) return [];
 
       return (parsed as CategorizedExpense[]).map((item) => ({
