@@ -16,11 +16,36 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  describe('GET /', () => {
+    it('should return health check', () => {
+      return request(app.getHttpServer())
+        .get('/')
+        .expect(200)
+        .expect('Hello World!');
+    });
+
+    it('should be accessible', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/')
+        .expect(200);
+
+      expect(response.text).toBe('Hello World!');
+    });
+  });
+
+  describe('404 handling', () => {
+    it('should return 404 for unknown routes', () => {
+      return request(app.getHttpServer())
+        .get('/unknown/route/that/does/not/exist')
+        .expect(404);
+    });
+  });
+
+  describe('Application startup', () => {
+    it('should be running', () => {
+      expect(app).toBeDefined();
+      expect(app.getHttpServer()).toBeDefined();
+    });
   });
 
   afterEach(async () => {

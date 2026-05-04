@@ -66,17 +66,21 @@ ai_note is a SHORT 1-sentence Edward-style comment (max 10 words). Return ONLY v
       ],
     });
 
-    const text = completion.choices[0]?.message?.content ?? '[]';
-    const parsed: unknown = JSON.parse(text.replace(/```json|```/g, '').trim());
-    if (!Array.isArray(parsed)) return [];
+    try {
+      const text = completion.choices[0]?.message?.content ?? '[]';
+      const parsed: unknown = JSON.parse(text.replace(/```json|```/g, '').trim());
+      if (!Array.isArray(parsed)) return [];
 
-    return (parsed as CategorizedExpense[]).map((item) => ({
-      description: String(item.description ?? ''),
-      category: VALID_CATEGORIES.includes(item.category)
-        ? item.category
-        : 'other',
-      ai_note: String(item.ai_note ?? ''),
-    }));
+      return (parsed as CategorizedExpense[]).map((item) => ({
+        description: String(item.description ?? ''),
+        category: VALID_CATEGORIES.includes(item.category)
+          ? item.category
+          : 'other',
+        ai_note: String(item.ai_note ?? ''),
+      }));
+    } catch {
+      return [];
+    }
   }
 
   async generateMonthlyReport(
