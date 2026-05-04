@@ -3,7 +3,10 @@ import { testUsers } from '../../__tests__/fixtures/test-data';
 
 describe('CurrentUser Decorator', () => {
   it('should extract user from request', () => {
-    const mockUser = { id: testUsers.standard.id, email: testUsers.standard.email };
+    const mockUser = {
+      id: testUsers.standard.id,
+      email: testUsers.standard.email,
+    };
     const mockExecutionContext = {
       switchToHttp: () => ({
         getRequest: () => ({
@@ -13,7 +16,9 @@ describe('CurrentUser Decorator', () => {
     } as unknown as ExecutionContext;
 
     const extractUser = (_data: unknown, ctx: ExecutionContext) => {
-      const request = ctx.switchToHttp().getRequest<{ user: { id: string; email: string } }>();
+      const request = ctx
+        .switchToHttp()
+        .getRequest<{ user: { id: string; email: string } }>();
       return request.user;
     };
 
@@ -37,7 +42,9 @@ describe('CurrentUser Decorator', () => {
     } as unknown as ExecutionContext;
 
     const extractUser = (_data: unknown, ctx: ExecutionContext) => {
-      const request = ctx.switchToHttp().getRequest<{ user: { id: string; email: string } }>();
+      const request = ctx
+        .switchToHttp()
+        .getRequest<{ user: { id: string; email: string } }>();
       return request.user;
     };
 
@@ -60,7 +67,9 @@ describe('CurrentUser Decorator', () => {
       } as unknown as ExecutionContext;
 
       const extractUser = (_data: unknown, ctx: ExecutionContext) => {
-        const request = ctx.switchToHttp().getRequest<{ user: { id: string; email: string } }>();
+        const request = ctx
+          .switchToHttp()
+          .getRequest<{ user: { id: string; email: string } }>();
         return request.user;
       };
 
@@ -72,7 +81,10 @@ describe('CurrentUser Decorator', () => {
   });
 
   it('should ignore data parameter', () => {
-    const mockUser = { id: testUsers.standard.id, email: testUsers.standard.email };
+    const mockUser = {
+      id: testUsers.standard.id,
+      email: testUsers.standard.email,
+    };
     const mockExecutionContext = {
       switchToHttp: () => ({
         getRequest: () => ({
@@ -82,7 +94,9 @@ describe('CurrentUser Decorator', () => {
     } as unknown as ExecutionContext;
 
     const extractUser = (_data: unknown, ctx: ExecutionContext) => {
-      const request = ctx.switchToHttp().getRequest<{ user: { id: string; email: string } }>();
+      const request = ctx
+        .switchToHttp()
+        .getRequest<{ user: { id: string; email: string } }>();
       return request.user;
     };
 

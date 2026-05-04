@@ -41,8 +41,8 @@ describe('Auth E2E', () => {
     await app.init();
 
     authService = module.get<AuthService>(AuthService);
-    prismaService = module.get(PrismaService) as any;
-    jwtService = module.get(JwtService) as any;
+    prismaService = module.get(PrismaService);
+    jwtService = module.get(JwtService);
   });
 
   afterAll(async () => {
@@ -57,7 +57,9 @@ describe('Auth E2E', () => {
     it('should register a new user', async () => {
       const dto = testDtos.validRegister;
 
-      (bcrypt.hash as jest.Mock).mockResolvedValue(testUsers.standard.passwordHash);
+      (bcrypt.hash as jest.Mock).mockResolvedValue(
+        testUsers.standard.passwordHash,
+      );
       prismaService.user.findUnique.mockResolvedValue(null);
       prismaService.user.create.mockResolvedValue({
         id: testUsers.standard.id,
@@ -174,9 +176,7 @@ describe('Auth E2E', () => {
     });
 
     it('should return 401 without auth header', async () => {
-      await request(app.getHttpServer())
-        .get('/auth/me')
-        .expect(401);
+      await request(app.getHttpServer()).get('/auth/me').expect(401);
     });
   });
 });

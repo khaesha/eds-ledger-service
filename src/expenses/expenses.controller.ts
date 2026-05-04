@@ -30,10 +30,7 @@ export class ExpensesController {
   }
 
   @Post()
-  create(
-    @CurrentUser() user: { id: string },
-    @Body() dto: CreateExpenseDto,
-  ) {
+  create(@CurrentUser() user: { id: string }, @Body() dto: CreateExpenseDto) {
     return this.expensesService.create(user.id, dto);
   }
 

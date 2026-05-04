@@ -5,7 +5,11 @@ import { ExpensesController } from '../src/expenses/expenses.controller';
 import { ExpensesService } from '../src/expenses/expenses.service';
 import { AuthGuard } from '@nestjs/passport';
 import { createMockPrismaService } from '../src/__tests__/mocks/prisma.mock';
-import { testUsers, testExpenses, testDtos } from '../src/__tests__/fixtures/test-data';
+import {
+  testUsers,
+  testExpenses,
+  testDtos,
+} from '../src/__tests__/fixtures/test-data';
 
 describe('Expenses E2E', () => {
   let app: INestApplication;
@@ -133,7 +137,9 @@ describe('Expenses E2E', () => {
     it('should delete an expense', async () => {
       const expenseId = testExpenses.normal.id;
 
-      (expensesService.remove as jest.Mock).mockResolvedValue(testExpenses.normal);
+      (expensesService.remove as jest.Mock).mockResolvedValue(
+        testExpenses.normal,
+      );
 
       const response = await request(app.getHttpServer())
         .delete(`/expenses/${expenseId}`)
@@ -169,7 +175,11 @@ describe('Expenses E2E', () => {
 
       const response = await request(app.getHttpServer())
         .post('/expenses/csv')
-        .attach('file', Buffer.from('description,amount\nTest,100'), 'expenses.csv')
+        .attach(
+          'file',
+          Buffer.from('description,amount\nTest,100'),
+          'expenses.csv',
+        )
         .expect(201);
 
       expect(response.body).toHaveProperty('imported');

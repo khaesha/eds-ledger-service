@@ -12,10 +12,7 @@ export class ChatController {
 
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post()
-  ask(
-    @CurrentUser() user: { id: string },
-    @Body() dto: ChatDto,
-  ) {
+  ask(@CurrentUser() user: { id: string }, @Body() dto: ChatDto) {
     return this.chatService.ask(user.id, dto.message);
   }
 }

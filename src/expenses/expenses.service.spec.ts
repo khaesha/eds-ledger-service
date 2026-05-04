@@ -4,7 +4,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { createMockPrismaService } from '../__tests__/mocks/prisma.mock';
-import { testUsers, testExpenses, testDtos } from '../__tests__/fixtures/test-data';
+import {
+  testUsers,
+  testExpenses,
+  testDtos,
+} from '../__tests__/fixtures/test-data';
 import * as fs from 'fs';
 
 describe('ExpensesService', () => {
@@ -35,7 +39,7 @@ describe('ExpensesService', () => {
     }).compile();
 
     service = module.get<ExpensesService>(ExpensesService);
-    prismaService = module.get(PrismaService) as any;
+    prismaService = module.get(PrismaService);
     aiService = module.get<AiService>(AiService);
   });
 
@@ -308,8 +312,8 @@ Lunch,75000,2026-05-02`;
 Coffee,50000,2026-05-01
 Gas,100000,2026-05-02`;
 
-      jest.spyOn(fs, 'readFileSync').mockReturnValue(csvContent as any);
-      jest.spyOn(fs, 'unlinkSync').mockReturnValue(undefined as any);
+      jest.spyOn(fs, 'readFileSync').mockReturnValue(csvContent);
+      jest.spyOn(fs, 'unlinkSync').mockReturnValue(undefined);
 
       (aiService.categorizeExpenses as jest.Mock).mockResolvedValue([
         { description: 'Coffee', category: 'food', ai_note: null },
@@ -321,7 +325,8 @@ Gas,100000,2026-05-02`;
 
       expect(result.imported).toBe(2);
       expect(prismaService.expense.createMany).toHaveBeenCalled();
-      const callData = (prismaService.expense.createMany as jest.Mock).mock.calls[0][0].data;
+      const callData = (prismaService.expense.createMany as jest.Mock).mock
+        .calls[0][0].data;
       expect(callData).toHaveLength(2);
       expect(callData.every((item: any) => item.amount > 0)).toBe(true);
     });

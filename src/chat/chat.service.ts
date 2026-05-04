@@ -20,7 +20,8 @@ export class ChatService {
 
     const categoryTotals: Record<string, number> = {};
     for (const exp of expenses) {
-      categoryTotals[exp.category] = (categoryTotals[exp.category] ?? 0) + exp.amount;
+      categoryTotals[exp.category] =
+        (categoryTotals[exp.category] ?? 0) + exp.amount;
     }
 
     const reply = await this.ai.chat(message, categoryTotals);

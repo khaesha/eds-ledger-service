@@ -33,15 +33,17 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    prismaService = module.get(PrismaService) as any;
-    jwtService = module.get(JwtService) as any;
+    prismaService = module.get(PrismaService);
+    jwtService = module.get(JwtService);
   });
 
   describe('register', () => {
     it('should successfully register a new user', async () => {
       const dto = testDtos.validRegister;
 
-      (bcrypt.hash as jest.Mock).mockResolvedValue(testUsers.standard.passwordHash);
+      (bcrypt.hash as jest.Mock).mockResolvedValue(
+        testUsers.standard.passwordHash,
+      );
       prismaService.user.findUnique.mockResolvedValue(null);
       prismaService.user.create.mockResolvedValue({
         id: testUsers.standard.id,
@@ -73,7 +75,9 @@ describe('AuthService', () => {
     it('should hash password with bcrypt before storing', async () => {
       const dto = testDtos.validRegister;
 
-      (bcrypt.hash as jest.Mock).mockResolvedValue(testUsers.standard.passwordHash);
+      (bcrypt.hash as jest.Mock).mockResolvedValue(
+        testUsers.standard.passwordHash,
+      );
       prismaService.user.findUnique.mockResolvedValue(null);
       prismaService.user.create.mockResolvedValue({
         id: testUsers.standard.id,
@@ -91,7 +95,10 @@ describe('AuthService', () => {
   describe('login', () => {
     it('should successfully login a user with valid credentials', async () => {
       const dto = testDtos.validLogin;
-      const mockUser = { ...testUsers.standard, password: testUsers.standard.passwordHash };
+      const mockUser = {
+        ...testUsers.standard,
+        password: testUsers.standard.passwordHash,
+      };
 
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
@@ -118,7 +125,10 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException if password is invalid', async () => {
       const dto = testDtos.validLogin;
-      const mockUser = { ...testUsers.standard, password: testUsers.standard.passwordHash };
+      const mockUser = {
+        ...testUsers.standard,
+        password: testUsers.standard.passwordHash,
+      };
 
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
@@ -128,7 +138,10 @@ describe('AuthService', () => {
 
     it('should not return password hash in response', async () => {
       const dto = testDtos.validLogin;
-      const mockUser = { ...testUsers.standard, password: testUsers.standard.passwordHash };
+      const mockUser = {
+        ...testUsers.standard,
+        password: testUsers.standard.passwordHash,
+      };
 
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
@@ -140,7 +153,10 @@ describe('AuthService', () => {
 
     it('should compare password with stored hash', async () => {
       const dto = testDtos.validLogin;
-      const mockUser = { ...testUsers.standard, password: testUsers.standard.passwordHash };
+      const mockUser = {
+        ...testUsers.standard,
+        password: testUsers.standard.passwordHash,
+      };
 
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);

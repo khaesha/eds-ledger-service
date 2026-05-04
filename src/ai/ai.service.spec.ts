@@ -22,7 +22,9 @@ describe('AiService', () => {
 
     // Mock OpenAI constructor
     const OpenAIModule = require('openai');
-    jest.spyOn(OpenAIModule, 'default').mockImplementation(() => mockOpenAiClient);
+    jest
+      .spyOn(OpenAIModule, 'default')
+      .mockImplementation(() => mockOpenAiClient);
 
     // Import AiService
     const { AiService } = require('./ai.service');
@@ -53,7 +55,11 @@ describe('AiService', () => {
           {
             message: {
               content: JSON.stringify([
-                { description: 'Coffee at Starbucks', category: 'food', ai_note: 'Morning coffee' },
+                {
+                  description: 'Coffee at Starbucks',
+                  category: 'food',
+                  ai_note: 'Morning coffee',
+                },
                 { description: 'Gas', category: 'transport', ai_note: 'Fuel' },
               ]),
             },
@@ -93,9 +99,7 @@ describe('AiService', () => {
     it('should handle API timeout gracefully', async () => {
       const expenses = [{ description: 'Test', amount: 1000 }];
 
-      mockOpenAiCreate.mockRejectedValue(
-        new Error('API timeout'),
-      );
+      mockOpenAiCreate.mockRejectedValue(new Error('API timeout'));
 
       await expect(service.categorizeExpenses(expenses)).rejects.toThrow();
     });
@@ -108,7 +112,11 @@ describe('AiService', () => {
           {
             message: {
               content: JSON.stringify([
-                { description: 'Test', category: 'invalid_category', ai_note: 'note' },
+                {
+                  description: 'Test',
+                  category: 'invalid_category',
+                  ai_note: 'note',
+                },
               ]),
             },
           },
@@ -129,7 +137,8 @@ describe('AiService', () => {
         choices: [
           {
             message: {
-              content: '```json\n[{"description":"Test","category":"food","ai_note":"note"}]\n```',
+              content:
+                '```json\n[{"description":"Test","category":"food","ai_note":"note"}]\n```',
             },
           },
         ],
@@ -161,7 +170,13 @@ describe('AiService', () => {
                 score: 78,
                 score_reason: 'Good spending habits',
                 summary: 'Your spending was balanced',
-                leaks: [{ name: 'Entertainment', amount: 100000, tip: 'Reduce spending' }],
+                leaks: [
+                  {
+                    name: 'Entertainment',
+                    amount: 100000,
+                    tip: 'Reduce spending',
+                  },
+                ],
                 wins: ['Good food budget'],
               }),
             },
@@ -171,7 +186,10 @@ describe('AiService', () => {
 
       mockOpenAiCreate.mockResolvedValue(mockResponse);
 
-      const result = await service.generateMonthlyReport(categoryTotals, totalSpent);
+      const result = await service.generateMonthlyReport(
+        categoryTotals,
+        totalSpent,
+      );
 
       expect(result.score).toBe(78);
       expect(result.score_reason).toBe('Good spending habits');
@@ -298,9 +316,7 @@ describe('AiService', () => {
       const userMessage = 'Test';
       const categoryTotals = {};
 
-      mockOpenAiCreate.mockRejectedValue(
-        new Error('API error'),
-      );
+      mockOpenAiCreate.mockRejectedValue(new Error('API error'));
 
       await expect(service.chat(userMessage, categoryTotals)).rejects.toThrow();
     });

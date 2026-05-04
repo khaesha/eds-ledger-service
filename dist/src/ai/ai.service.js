@@ -59,17 +59,22 @@ ai_note is a SHORT 1-sentence Edward-style comment (max 10 words). Return ONLY v
                 },
             ],
         });
-        const text = completion.choices[0]?.message?.content ?? '[]';
-        const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-        if (!Array.isArray(parsed))
+        try {
+            const text = completion.choices[0]?.message?.content ?? '[]';
+            const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+            if (!Array.isArray(parsed))
+                return [];
+            return parsed.map((item) => ({
+                description: String(item.description ?? ''),
+                category: VALID_CATEGORIES.includes(item.category)
+                    ? item.category
+                    : 'other',
+                ai_note: String(item.ai_note ?? ''),
+            }));
+        }
+        catch {
             return [];
-        return parsed.map((item) => ({
-            description: String(item.description ?? ''),
-            category: VALID_CATEGORIES.includes(item.category)
-                ? item.category
-                : 'other',
-            ai_note: String(item.ai_note ?? ''),
-        }));
+        }
     }
     async generateMonthlyReport(categoryTotals, totalSpent) {
         const completion = await this.client.chat.completions.create({

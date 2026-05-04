@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExpensesController } from './expenses.controller';
 import { ExpensesService } from './expenses.service';
-import { testUsers, testExpenses, testDtos } from '../__tests__/fixtures/test-data';
+import {
+  testUsers,
+  testExpenses,
+  testDtos,
+} from '../__tests__/fixtures/test-data';
 
 describe('ExpensesController', () => {
   let controller: ExpensesController;
@@ -156,7 +160,10 @@ describe('ExpensesController', () => {
 
       await controller.importCsv(user, mockFile);
 
-      expect(expensesService.importCsv).toHaveBeenCalledWith(user.id, mockFile.path);
+      expect(expensesService.importCsv).toHaveBeenCalledWith(
+        user.id,
+        mockFile.path,
+      );
     });
 
     it('should return import result', async () => {
