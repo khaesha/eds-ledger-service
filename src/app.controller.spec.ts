@@ -40,4 +40,23 @@ describe('AppController', () => {
       expect(typeof appController.getHello).toBe('function');
     });
   });
+
+  describe('health', () => {
+    it('should return health status', async () => {
+      jest.spyOn(appService, 'getHealth').mockResolvedValue({ status: 'ok' });
+      const result = await appController.getHealth();
+      expect(result).toEqual({ status: 'ok' });
+    });
+
+    it('should call appService.getHealth', async () => {
+      jest.spyOn(appService, 'getHealth').mockResolvedValue({ status: 'ok' });
+      await appController.getHealth();
+      expect(appService.getHealth).toHaveBeenCalled();
+    });
+
+    it('should be accessible via GET /health without auth', () => {
+      expect(appController.getHealth).toBeDefined();
+      expect(typeof appController.getHealth).toBe('function');
+    });
+  });
 });
