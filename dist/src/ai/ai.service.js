@@ -16,6 +16,8 @@ exports.AiService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const openai_1 = __importDefault(require("openai"));
+const pino_logger_service_1 = require("../common/logger/pino-logger.service");
+const ai_schemas_1 = require("./ai.schemas");
 const VALID_CATEGORIES = [
     'food',
     'transport',
@@ -30,9 +32,11 @@ const VALID_CATEGORIES = [
 const MODEL = 'meta-llama/llama-3.1-8b-instruct';
 let AiService = class AiService {
     config;
+    logger;
     client;
-    constructor(config) {
+    constructor(config, logger) {
         this.config = config;
+        this.logger = logger;
         this.client = new openai_1.default({
             apiKey: this.config.get('OPENROUTER_API_KEY'),
             baseURL: 'https://openrouter.ai/api/v1',
@@ -62,17 +66,13 @@ ai_note is a SHORT 1-sentence Edward-style comment (max 10 words). Return ONLY v
         try {
             const text = completion.choices[0]?.message?.content ?? '[]';
             const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-            if (!Array.isArray(parsed))
-                return [];
-            return parsed.map((item) => ({
-                description: String(item.description ?? ''),
-                category: VALID_CATEGORIES.includes(item.category)
-                    ? item.category
-                    : 'other',
-                ai_note: String(item.ai_note ?? ''),
-            }));
+            const validated = (0, ai_schemas_1.validateCategorizedExpenses)(parsed);
+            return validated;
         }
-        catch {
+        catch (error) {
+            this.logger.debug('AI categorization validation failed', {
+                error: error instanceof Error ? error.message : String(error),
+            });
             return [];
         }
     }
@@ -94,15 +94,18 @@ Return ONLY valid JSON (no markdown):
                 },
             ],
         });
-        const text = completion.choices[0]?.message?.content ?? '{}';
-        const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-        return {
-            score: Math.min(100, Math.max(0, Number(parsed.score) || 50)),
-            score_reason: String(parsed.score_reason ?? ''),
-            summary: String(parsed.summary ?? ''),
-            leaks: Array.isArray(parsed.leaks) ? parsed.leaks : [],
-            wins: Array.isArray(parsed.wins) ? parsed.wins : [],
-        };
+        try {
+            const text = completion.choices[0]?.message?.content ?? '{}';
+            const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+            const validated = (0, ai_schemas_1.validateReportResult)(parsed);
+            return validated;
+        }
+        catch (error) {
+            this.logger.debug('AI report generation validation failed', {
+                error: error instanceof Error ? error.message : String(error),
+            });
+            return (0, ai_schemas_1.validateReportResult)({});
+        }
     }
     async chat(userMessage, categoryTotals) {
         const completion = await this.client.chat.completions.create({
@@ -124,6 +127,7 @@ EXPENSE DATA (IDR): ${JSON.stringify(categoryTotals)}`,
 exports.AiService = AiService;
 exports.AiService = AiService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    __metadata("design:paramtypes", [config_1.ConfigService,
+        pino_logger_service_1.LoggerService])
 ], AiService);
 //# sourceMappingURL=ai.service.js.map

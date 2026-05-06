@@ -1,10 +1,12 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { LoggerService } from '../common/logger/pino-logger.service';
 import { RegisterDto, LoginDto } from './auth.dto';
 export declare class AuthService {
     private readonly prisma;
     private readonly jwtService;
-    constructor(prisma: PrismaService, jwtService: JwtService);
+    private readonly logger;
+    constructor(prisma: PrismaService, jwtService: JwtService, logger: LoggerService);
     register(dto: RegisterDto): Promise<{
         user: {
             email: string;

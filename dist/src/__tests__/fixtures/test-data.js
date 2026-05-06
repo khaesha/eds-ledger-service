@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.testDtos = exports.testReports = exports.testExpenses = exports.testUsers = void 0;
 exports.testUsers = {
     standard: {
-        id: 'user-1',
+        id: '550e8400-e29b-41d4-a716-446655440000',
         email: 'user@example.com',
         password: 'Test@1234',
         passwordHash: '$2b$12$hashedTest@1234',
@@ -11,7 +11,7 @@ exports.testUsers = {
         createdAt: new Date('2026-01-01'),
     },
     admin: {
-        id: 'user-2',
+        id: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         password: 'Admin@1234',
         passwordHash: '$2b$12$hashedAdmin@1234',
@@ -19,7 +19,7 @@ exports.testUsers = {
         createdAt: new Date('2026-01-01'),
     },
     other: {
-        id: 'user-3',
+        id: '550e8400-e29b-41d4-a716-446655440002',
         email: 'other@example.com',
         password: 'Other@1234',
         passwordHash: '$2b$12$hashedOther@1234',
@@ -29,8 +29,8 @@ exports.testUsers = {
 };
 exports.testExpenses = {
     normal: {
-        id: 'expense-1',
-        userId: 'user-1',
+        id: '660e8400-e29b-41d4-a716-446655440000',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         description: 'Coffee at Starbucks',
         amount: 50000,
         category: 'food',
@@ -39,8 +39,8 @@ exports.testExpenses = {
         createdAt: new Date('2026-05-01'),
     },
     large: {
-        id: 'expense-2',
-        userId: 'user-1',
+        id: '660e8400-e29b-41d4-a716-446655440001',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         description: 'Monthly rent payment',
         amount: 10000000,
         category: 'utilities',
@@ -49,8 +49,8 @@ exports.testExpenses = {
         createdAt: new Date('2026-05-03'),
     },
     future: {
-        id: 'expense-3',
-        userId: 'user-1',
+        id: '660e8400-e29b-41d4-a716-446655440002',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         description: 'Future trip booking',
         amount: 5000000,
         category: 'entertainment',
@@ -59,8 +59,8 @@ exports.testExpenses = {
         createdAt: new Date('2026-05-02'),
     },
     duplicateCategory: {
-        id: 'expense-4',
-        userId: 'user-1',
+        id: '660e8400-e29b-41d4-a716-446655440003',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         description: 'Restaurant dinner',
         amount: 250000,
         category: 'food',
@@ -69,8 +69,8 @@ exports.testExpenses = {
         createdAt: new Date('2026-05-04'),
     },
     zeroAmount: {
-        id: 'expense-5',
-        userId: 'user-1',
+        id: '660e8400-e29b-41d4-a716-446655440004',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         description: 'Free sample event',
         amount: 0,
         category: 'other',
@@ -81,8 +81,8 @@ exports.testExpenses = {
 };
 exports.testReports = {
     current: {
-        id: 'report-1',
-        userId: 'user-1',
+        id: '770e8400-e29b-41d4-a716-446655440000',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         year: 2026,
         month: 5,
         score: 78,
@@ -105,8 +105,8 @@ exports.testReports = {
         generatedAt: new Date('2026-05-01T12:00:00Z'),
     },
     previous: {
-        id: 'report-2',
-        userId: 'user-1',
+        id: '770e8400-e29b-41d4-a716-446655440001',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         year: 2026,
         month: 4,
         score: 65,

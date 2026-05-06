@@ -2,7 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChatService } from './chat.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
+import { LoggerService } from '../common/logger/pino-logger.service';
 import { createMockPrismaService } from '../__tests__/mocks/prisma.mock';
+import { createMockLoggerService } from '../__tests__/mocks/logger.mock';
 import { testUsers, testExpenses } from '../__tests__/fixtures/test-data';
 
 describe('ChatService', () => {
@@ -29,6 +31,10 @@ describe('ChatService', () => {
         {
           provide: AiService,
           useValue: mockAiService,
+        },
+        {
+          provide: LoggerService,
+          useValue: createMockLoggerService(),
         },
       ],
     }).compile();

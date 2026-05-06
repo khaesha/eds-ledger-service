@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { ReportsController } from '../src/reports/reports.controller';
 import { ReportsService } from '../src/reports/reports.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -11,7 +11,11 @@ describe('Reports E2E', () => {
   let reportsService: ReportsService;
 
   const mockAuthGuard = {
-    canActivate: () => true,
+    canActivate: (context: any) => {
+      const request = context.switchToHttp().getRequest();
+      request.user = { id: 'test-user-id', email: 'test@example.com' };
+      return true;
+    },
   };
 
   beforeAll(async () => {

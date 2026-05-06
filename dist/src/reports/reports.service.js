@@ -37,7 +37,8 @@ let ReportsService = class ReportsService {
         const categoryTotals = {};
         let totalSpent = 0;
         for (const exp of expenses) {
-            categoryTotals[exp.category] = (categoryTotals[exp.category] ?? 0) + exp.amount;
+            categoryTotals[exp.category] =
+                (categoryTotals[exp.category] ?? 0) + exp.amount;
             totalSpent += exp.amount;
         }
         let result;
@@ -59,19 +60,19 @@ let ReportsService = class ReportsService {
                 userId,
                 year,
                 month,
-                score: result.score,
-                scoreReason: result.score_reason,
-                summary: result.summary,
-                leaks: result.leaks,
-                wins: result.wins,
+                score: result.score ?? 0,
+                scoreReason: result.score_reason ?? '',
+                summary: result.summary ?? '',
+                leaks: result.leaks ?? [],
+                wins: result.wins ?? [],
                 categoryTotals,
             },
             update: {
-                score: result.score,
-                scoreReason: result.score_reason,
-                summary: result.summary,
-                leaks: result.leaks,
-                wins: result.wins,
+                score: result.score ?? 0,
+                scoreReason: result.score_reason ?? '',
+                summary: result.summary ?? '',
+                leaks: result.leaks ?? [],
+                wins: result.wins ?? [],
                 categoryTotals,
                 generatedAt: new Date(),
             },

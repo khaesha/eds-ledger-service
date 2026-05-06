@@ -13,14 +13,18 @@ exports.ChatService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const ai_service_1 = require("../ai/ai.service");
+const pino_logger_service_1 = require("../common/logger/pino-logger.service");
 let ChatService = class ChatService {
     prisma;
     ai;
-    constructor(prisma, ai) {
+    logger;
+    constructor(prisma, ai, logger) {
         this.prisma = prisma;
         this.ai = ai;
+        this.logger = logger;
     }
     async ask(userId, message) {
+        this.detectAndLogInjectionAttempts(userId, message);
         const now = new Date();
         const start = new Date(now.getFullYear(), now.getMonth(), 1);
         const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -29,16 +33,36 @@ let ChatService = class ChatService {
         });
         const categoryTotals = {};
         for (const exp of expenses) {
-            categoryTotals[exp.category] = (categoryTotals[exp.category] ?? 0) + exp.amount;
+            categoryTotals[exp.category] =
+                (categoryTotals[exp.category] ?? 0) + exp.amount;
         }
         const reply = await this.ai.chat(message, categoryTotals);
         return { reply };
+    }
+    detectAndLogInjectionAttempts(userId, message) {
+        const injectionPatterns = [
+            /system\s*:/i,
+            /ignore previous/i,
+            /forget everything/i,
+            /new instructions/i,
+            /jailbreak/i,
+        ];
+        const hasInjectionPattern = injectionPatterns.some((pattern) => pattern.test(message));
+        if (hasInjectionPattern) {
+            this.logger.securityEvent({
+                type: 'INJECTION_ATTEMPT',
+                userId,
+                endpoint: '/chat',
+                details: { messageLength: message.length },
+            });
+        }
     }
 };
 exports.ChatService = ChatService;
 exports.ChatService = ChatService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        ai_service_1.AiService])
+        ai_service_1.AiService,
+        pino_logger_service_1.LoggerService])
 ], ChatService);
 //# sourceMappingURL=chat.service.js.map

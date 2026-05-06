@@ -6,37 +6,37 @@ export declare class ExpensesController {
     findAll(user: {
         id: string;
     }): Promise<{
+        userId: string;
         id: string;
         createdAt: Date;
         description: string;
-        amount: number;
-        date: Date;
-        userId: string;
         category: string;
+        date: Date;
+        amount: number;
         aiNote: string | null;
     }[]>;
     create(user: {
         id: string;
     }, dto: CreateExpenseDto): Promise<{
+        userId: string;
         id: string;
         createdAt: Date;
         description: string;
-        amount: number;
-        date: Date;
-        userId: string;
         category: string;
+        date: Date;
+        amount: number;
         aiNote: string | null;
     }>;
     remove(user: {
         id: string;
     }, id: string): Promise<{
+        userId: string;
         id: string;
         createdAt: Date;
         description: string;
-        amount: number;
-        date: Date;
-        userId: string;
         category: string;
+        date: Date;
+        amount: number;
         aiNote: string | null;
     }>;
     importCsv(user: {

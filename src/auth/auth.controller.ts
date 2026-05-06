@@ -17,6 +17,7 @@ import { RegisterDto, LoginDto } from './auth.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Throttle({ default: { limit: 3, ttl: 3600000 } })
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);

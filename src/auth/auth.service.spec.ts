@@ -2,9 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { LoggerService } from '../common/logger/pino-logger.service';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { createMockPrismaService } from '../__tests__/mocks/prisma.mock';
 import { createMockJwtService } from '../__tests__/mocks/jwt.mock';
+import { createMockLoggerService } from '../__tests__/mocks/logger.mock';
 import { testUsers, testDtos } from '../__tests__/fixtures/test-data';
 import * as bcrypt from 'bcrypt';
 
@@ -28,6 +30,10 @@ describe('AuthService', () => {
         {
           provide: JwtService,
           useValue: createMockJwtService(),
+        },
+        {
+          provide: LoggerService,
+          useValue: createMockLoggerService(),
         },
       ],
     }).compile();
