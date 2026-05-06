@@ -5,13 +5,13 @@ export declare class ReportsController {
     getReport(user: {
         id: string;
     }, year: number, month: number): Promise<{
+        userId: string;
         id: string;
         year: number;
-        score: number;
         summary: string;
+        score: number;
         leaks: import("@prisma/client/runtime/client").JsonValue;
         wins: import("@prisma/client/runtime/client").JsonValue;
-        userId: string;
         month: number;
         scoreReason: string;
         categoryTotals: import("@prisma/client/runtime/client").JsonValue;
@@ -20,13 +20,13 @@ export declare class ReportsController {
     generateReport(user: {
         id: string;
     }, year: number, month: number): Promise<{
+        userId: string;
         id: string;
         year: number;
-        score: number;
         summary: string;
+        score: number;
         leaks: import("@prisma/client/runtime/client").JsonValue;
         wins: import("@prisma/client/runtime/client").JsonValue;
-        userId: string;
         month: number;
         scoreReason: string;
         categoryTotals: import("@prisma/client/runtime/client").JsonValue;

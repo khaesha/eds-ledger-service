@@ -1,6 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import {
+  INestApplication,
+  ValidationPipe,
+  ExecutionContext,
+} from '@nestjs/common';
+import request from 'supertest';
 import { ExpensesController } from '../src/expenses/expenses.controller';
 import { ExpensesService } from '../src/expenses/expenses.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -16,7 +20,14 @@ describe('Expenses E2E', () => {
   let expensesService: ExpensesService;
 
   const mockAuthGuard = {
-    canActivate: () => true,
+    canActivate: (context: ExecutionContext) => {
+      const req = context.switchToHttp().getRequest();
+      req.user = {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        email: 'user@example.com',
+      };
+      return true;
+    },
   };
 
   beforeAll(async () => {

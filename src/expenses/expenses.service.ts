@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
+import { LoggerService } from '../common/logger/pino-logger.service';
 import { CreateExpenseDto } from './expenses.dto';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -15,6 +16,7 @@ export class ExpensesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ai: AiService,
+    private readonly logger: LoggerService,
   ) {}
 
   async findAll(userId: string) {
@@ -57,6 +59,17 @@ export class ExpensesService {
       where: { id: expenseId },
     });
     if (!expense || expense.userId !== userId) {
+      if (expense && expense.userId !== userId) {
+        this.logger.securityEvent({
+          type: 'IDOR_ATTEMPT',
+          userId,
+          endpoint: `/expenses/${expenseId}`,
+          details: {
+            attemptedResourceId: expenseId,
+            actualOwnerId: expense.userId,
+          },
+        });
+      }
       throw new NotFoundException('Expense not found');
     }
     return this.prisma.expense.delete({ where: { id: expenseId } });

@@ -198,7 +198,25 @@ generatedAt (DateTime)
 
 Relations: User → Expenses/Reports (cascade delete)
 
-## 🧪 Testing
+## 🔒 Security
+
+This backend implements **OWASP Top 10 2025** best practices:
+
+- **Authentication**: JWT tokens (15-minute expiration), bcrypt password hashing (cost=12)
+- **Authorization**: JWT guards on all protected endpoints, ownership checks on resources to prevent IDOR
+- **Input Validation**: class-validator DTOs with whitelist & forbidNonWhitelisted mode
+- **Injection Prevention**: Parameterized queries (Prisma ORM), no raw SQL
+- **Rate Limiting**: Login (5/15min), Chat (20/min), Register (3/hour)
+- **Security Headers**: Helmet.js with CSP, HSTS, X-Frame-Options, X-Content-Type-Options
+- **Error Handling**: Production mode hides stack traces; full details logged server-side
+- **Logging**: Pino structured logs with PII redaction, correlation IDs, security events
+- **LLM Output Validation**: Zod schemas validate AI-generated categorization and reports
+- **CORS**: Environment-controlled origin, credentials enabled, no wildcards
+- **File Uploads**: MIME type validation, size limits, random filenames
+
+For detailed security policies and PR guidelines, see [SECURITY.md](./SECURITY.md).
+
+
 
 ```bash
 # Unit tests

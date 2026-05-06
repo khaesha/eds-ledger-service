@@ -2,8 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ExpensesService } from './expenses.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
+import { LoggerService } from '../common/logger/pino-logger.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { createMockPrismaService } from '../__tests__/mocks/prisma.mock';
+import { createMockLoggerService } from '../__tests__/mocks/logger.mock';
 import {
   testUsers,
   testExpenses,
@@ -34,6 +36,10 @@ describe('ExpensesService', () => {
         {
           provide: AiService,
           useValue: mockAiService,
+        },
+        {
+          provide: LoggerService,
+          useValue: createMockLoggerService(),
         },
       ],
     }).compile();

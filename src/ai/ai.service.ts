@@ -1,20 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-
-export interface CategorizedExpense {
-  description: string;
-  category: string;
-  ai_note: string;
-}
-
-export interface ReportResult {
-  score: number;
-  score_reason: string;
-  summary: string;
-  leaks: { name: string; amount: number; tip: string }[];
-  wins: string[];
-}
+import { LoggerService } from '../common/logger/pino-logger.service';
+import {
+  validateCategorizedExpenses,
+  validateReportResult,
+  type CategorizedExpense,
+  type ReportResult,
+} from './ai.schemas';
 
 const VALID_CATEGORIES = [
   'food',
@@ -35,7 +28,10 @@ const MODEL = 'meta-llama/llama-3.1-8b-instruct';
 export class AiService {
   private readonly client: OpenAI;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(
+    private readonly config: ConfigService,
+    private readonly logger: LoggerService,
+  ) {
     this.client = new OpenAI({
       apiKey: this.config.get<string>('OPENROUTER_API_KEY'),
       baseURL: 'https://openrouter.ai/api/v1',
@@ -68,19 +64,16 @@ ai_note is a SHORT 1-sentence Edward-style comment (max 10 words). Return ONLY v
 
     try {
       const text = completion.choices[0]?.message?.content ?? '[]';
-      const parsed: unknown = JSON.parse(
+      const parsed = JSON.parse(
         text.replace(/```json|```/g, '').trim(),
-      );
-      if (!Array.isArray(parsed)) return [];
+      ) as unknown;
 
-      return (parsed as CategorizedExpense[]).map((item) => ({
-        description: String(item.description ?? ''),
-        category: VALID_CATEGORIES.includes(item.category)
-          ? item.category
-          : 'other',
-        ai_note: String(item.ai_note ?? ''),
-      }));
-    } catch {
+      const validated = validateCategorizedExpenses(parsed);
+      return validated;
+    } catch (error) {
+      this.logger.debug('AI categorization validation failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
   }
@@ -107,18 +100,20 @@ Return ONLY valid JSON (no markdown):
       ],
     });
 
-    const text = completion.choices[0]?.message?.content ?? '{}';
-    const parsed = JSON.parse(
-      text.replace(/```json|```/g, '').trim(),
-    ) as ReportResult;
+    try {
+      const text = completion.choices[0]?.message?.content ?? '{}';
+      const parsed = JSON.parse(
+        text.replace(/```json|```/g, '').trim(),
+      ) as unknown;
 
-    return {
-      score: Math.min(100, Math.max(0, Number(parsed.score) || 50)),
-      score_reason: String(parsed.score_reason ?? ''),
-      summary: String(parsed.summary ?? ''),
-      leaks: Array.isArray(parsed.leaks) ? parsed.leaks : [],
-      wins: Array.isArray(parsed.wins) ? parsed.wins : [],
-    };
+      const validated = validateReportResult(parsed);
+      return validated;
+    } catch (error) {
+      this.logger.debug('AI report generation validation failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return validateReportResult({});
+    }
   }
 
   async chat(
@@ -142,3 +137,5 @@ EXPENSE DATA (IDR): ${JSON.stringify(categoryTotals)}`,
     return completion.choices[0]?.message?.content ?? '';
   }
 }
+
+export type { CategorizedExpense, ReportResult };

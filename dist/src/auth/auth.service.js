@@ -47,24 +47,38 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
 const prisma_service_1 = require("../prisma/prisma.service");
+const pino_logger_service_1 = require("../common/logger/pino-logger.service");
 let AuthService = class AuthService {
     prisma;
     jwtService;
-    constructor(prisma, jwtService) {
+    logger;
+    constructor(prisma, jwtService, logger) {
         this.prisma = prisma;
         this.jwtService = jwtService;
+        this.logger = logger;
     }
     async register(dto) {
         const existing = await this.prisma.user.findUnique({
             where: { email: dto.email },
         });
         if (existing) {
+            this.logger.info('Registration attempt with existing email', {
+                email: dto.email,
+                endpoint: '/auth/register',
+            });
             throw new common_1.ConflictException('Email already in use');
         }
         const passwordHash = await bcrypt.hash(dto.password, 12);
         const user = await this.prisma.user.create({
             data: { email: dto.email, password: passwordHash, name: dto.name },
             select: { id: true, email: true, name: true, createdAt: true },
+        });
+        this.logger.securityEvent({
+            type: 'AUTH_SUCCESS',
+            userId: user.id,
+            username: user.email,
+            endpoint: '/auth/register',
+            details: { action: 'user_registration' },
         });
         const token = this.signToken(user.id, user.email);
         return { user, token };
@@ -74,13 +88,32 @@ let AuthService = class AuthService {
             where: { email: dto.email },
         });
         if (!user) {
+            this.logger.securityEvent({
+                type: 'AUTH_FAILED',
+                username: dto.email,
+                endpoint: '/auth/login',
+                details: { reason: 'user_not_found' },
+            });
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
         const valid = await bcrypt.compare(dto.password, user.password);
         if (!valid) {
+            this.logger.securityEvent({
+                type: 'AUTH_FAILED',
+                username: dto.email,
+                userId: user.id,
+                endpoint: '/auth/login',
+                details: { reason: 'invalid_password' },
+            });
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
-        const { password: _pwd, ...safeUser } = user;
+        this.logger.securityEvent({
+            type: 'AUTH_SUCCESS',
+            userId: user.id,
+            username: user.email,
+            endpoint: '/auth/login',
+        });
+        const { password, ...safeUser } = user;
         const token = this.signToken(user.id, user.email);
         return { user: safeUser, token };
     }
@@ -92,6 +125,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        pino_logger_service_1.LoggerService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

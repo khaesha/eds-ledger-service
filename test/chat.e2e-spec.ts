@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { ChatController } from '../src/chat/chat.controller';
 import { ChatService } from '../src/chat/chat.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -10,7 +10,11 @@ describe('Chat E2E', () => {
   let chatService: ChatService;
 
   const mockAuthGuard = {
-    canActivate: () => true,
+    canActivate: (context: any) => {
+      const request = context.switchToHttp().getRequest();
+      request.user = { id: 'test-user-id', email: 'test@example.com' };
+      return true;
+    },
   };
 
   beforeAll(async () => {

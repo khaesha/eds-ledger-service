@@ -1,16 +1,56 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import {
+  INestApplication,
+  ValidationPipe,
+  CanActivate,
+  ExecutionContext,
+} from '@nestjs/common';
+import request from 'supertest';
+import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 import { AuthController } from '../src/auth/auth.controller';
 import { AuthService } from '../src/auth/auth.service';
+import { JwtStrategy } from '../src/auth/jwt.strategy';
+import { LoggerService } from '../src/common/logger/pino-logger.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { createMockPrismaService } from '../src/__tests__/mocks/prisma.mock';
 import { createMockJwtService } from '../src/__tests__/mocks/jwt.mock';
+import { createMockLoggerService } from '../src/__tests__/mocks/logger.mock';
 import { testUsers, testDtos } from '../src/__tests__/fixtures/test-data';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
+
+// Mock AuthGuard('jwt') globally - define guard inline to avoid hoisting issues
+jest.mock('@nestjs/passport', () => {
+  const actual = jest.requireActual('@nestjs/passport');
+  const { UnauthorizedException } = jest.requireActual('@nestjs/common');
+
+  // Define MockAuthGuard inline
+  class MockAuthGuard implements CanActivate {
+    canActivate(context: ExecutionContext): boolean {
+      const req = context.switchToHttp().getRequest();
+      const authHeader = req.headers['authorization'];
+
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        req.user = {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          email: 'user@example.com',
+        };
+        return true;
+      }
+
+      // Throw UnauthorizedException to return 401 instead of 403
+      throw new UnauthorizedException('Unauthorized');
+    }
+  }
+
+  return {
+    ...actual,
+    AuthGuard: () => MockAuthGuard,
+  };
+});
 
 describe('Auth E2E', () => {
   let app: INestApplication;
@@ -21,10 +61,21 @@ describe('Auth E2E', () => {
   beforeAll(async () => {
     jest.clearAllMocks();
 
+    // Set environment variable for ConfigService
+    process.env.JWT_SECRET =
+      'test-jwt-secret-very-long-for-testing-purposes-32-chars';
+
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+        }),
+        PassportModule,
+      ],
       controllers: [AuthController],
       providers: [
         AuthService,
+        JwtStrategy,
         {
           provide: PrismaService,
           useValue: createMockPrismaService(),
@@ -32,6 +83,10 @@ describe('Auth E2E', () => {
         {
           provide: JwtService,
           useValue: createMockJwtService(),
+        },
+        {
+          provide: LoggerService,
+          useValue: createMockLoggerService(),
         },
       ],
     }).compile();

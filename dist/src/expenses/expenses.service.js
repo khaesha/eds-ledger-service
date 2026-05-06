@@ -46,15 +46,18 @@ exports.ExpensesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const ai_service_1 = require("../ai/ai.service");
+const pino_logger_service_1 = require("../common/logger/pino-logger.service");
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 const sync_1 = require("csv-parse/sync");
 let ExpensesService = class ExpensesService {
     prisma;
     ai;
-    constructor(prisma, ai) {
+    logger;
+    constructor(prisma, ai, logger) {
         this.prisma = prisma;
         this.ai = ai;
+        this.logger = logger;
     }
     async findAll(userId) {
         return this.prisma.expense.findMany({
@@ -92,6 +95,17 @@ let ExpensesService = class ExpensesService {
             where: { id: expenseId },
         });
         if (!expense || expense.userId !== userId) {
+            if (expense && expense.userId !== userId) {
+                this.logger.securityEvent({
+                    type: 'IDOR_ATTEMPT',
+                    userId,
+                    endpoint: `/expenses/${expenseId}`,
+                    details: {
+                        attemptedResourceId: expenseId,
+                        actualOwnerId: expense.userId,
+                    },
+                });
+            }
             throw new common_1.NotFoundException('Expense not found');
         }
         return this.prisma.expense.delete({ where: { id: expenseId } });
@@ -120,7 +134,10 @@ let ExpensesService = class ExpensesService {
         }
         let categorized = [];
         try {
-            categorized = await this.ai.categorizeExpenses(toProcess.map((r) => ({ description: r.description, amount: r.amount })));
+            categorized = await this.ai.categorizeExpenses(toProcess.map((r) => ({
+                description: r.description,
+                amount: r.amount,
+            })));
         }
         catch {
         }
@@ -140,6 +157,7 @@ exports.ExpensesService = ExpensesService;
 exports.ExpensesService = ExpensesService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        ai_service_1.AiService])
+        ai_service_1.AiService,
+        pino_logger_service_1.LoggerService])
 ], ExpensesService);
 //# sourceMappingURL=expenses.service.js.map

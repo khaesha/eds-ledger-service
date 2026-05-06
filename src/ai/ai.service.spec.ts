@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { LoggerService } from '../common/logger/pino-logger.service';
 import { createMockConfigService } from '../__tests__/mocks/config.mock';
+import { createMockLoggerService } from '../__tests__/mocks/logger.mock';
 
 describe('AiService', () => {
   let service: any;
@@ -35,6 +37,10 @@ describe('AiService', () => {
         {
           provide: ConfigService,
           useValue: createMockConfigService(),
+        },
+        {
+          provide: LoggerService,
+          useValue: createMockLoggerService(),
         },
       ],
     }).compile();

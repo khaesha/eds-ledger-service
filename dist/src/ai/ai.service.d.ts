@@ -1,24 +1,11 @@
 import { ConfigService } from '@nestjs/config';
-export interface CategorizedExpense {
-    description: string;
-    category: string;
-    ai_note: string;
-}
-export interface ReportResult {
-    score: number;
-    score_reason: string;
-    summary: string;
-    leaks: {
-        name: string;
-        amount: number;
-        tip: string;
-    }[];
-    wins: string[];
-}
+import { LoggerService } from '../common/logger/pino-logger.service';
+import { type CategorizedExpense, type ReportResult } from './ai.schemas';
 export declare class AiService {
     private readonly config;
+    private readonly logger;
     private readonly client;
-    constructor(config: ConfigService);
+    constructor(config: ConfigService, logger: LoggerService);
     categorizeExpenses(expenses: {
         description: string;
         amount: number;
@@ -26,3 +13,4 @@ export declare class AiService {
     generateMonthlyReport(categoryTotals: Record<string, number>, totalSpent: number): Promise<ReportResult>;
     chat(userMessage: string, categoryTotals: Record<string, number>): Promise<string>;
 }
+export type { CategorizedExpense, ReportResult };
